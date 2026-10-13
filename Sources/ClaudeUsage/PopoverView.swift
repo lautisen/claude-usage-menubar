@@ -1,26 +1,11 @@
 import SwiftUI
 
 func usageColor(_ percent: Double) -> Color {
-    switch percent {
-    case ..<50: return .green
-    case ..<80: return .orange
-    default: return .red
+    switch UsageLevel(percent: percent) {
+    case .low: return .green
+    case .medium: return .orange
+    case .high: return .red
     }
-}
-
-func formatCountdown(to date: Date, now: Date = Date()) -> String {
-    let seconds = max(0, Int(date.timeIntervalSince(now)))
-    let days = seconds / 86_400, hours = (seconds % 86_400) / 3600, minutes = (seconds % 3600) / 60
-    if days > 0 { return "\(days) d \(hours) h" }
-    if hours > 0 { return "\(hours) h \(minutes) min" }
-    return "\(minutes) min"
-}
-
-func formatResetTime(_ date: Date) -> String {
-    let formatter = DateFormatter()
-    formatter.locale = Locale(identifier: "es_ES")
-    formatter.dateFormat = Calendar.current.isDateInToday(date) ? "HH:mm" : "EEE d, HH:mm"
-    return formatter.string(from: date)
 }
 
 struct PopoverView: View {

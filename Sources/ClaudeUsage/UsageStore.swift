@@ -14,7 +14,12 @@ final class UsageStore: ObservableObject {
     var onChange: (() -> Void)?
 
     private var timer: Timer?
+    private let fetcher: () async throws -> (UsageResponse, Credentials)
     static let refreshInterval: TimeInterval = 120
+
+    init(fetcher: @escaping () async throws -> (UsageResponse, Credentials) = { try await UsageService.fetch() }) {
+        self.fetcher = fetcher
+    }
 
     var sessionPercent: Double? { usage?.fiveHour?.utilization }
 
@@ -35,26 +40,34 @@ final class UsageStore: ObservableObject {
 
     /// Refresca al abrir el desplegable, salvo que los datos sean muy recientes.
     func refreshIfStale() {
-        guard let last = lastUpdated, Date().timeIntervalSince(last) < 30 else { return refresh() }
+        if isStale() { refresh() }
+    }
+
+    func isStale(now: Date = Date()) -> Bool {
+        guard let lastUpdated else { return true }
+        return now.timeIntervalSince(lastUpdated) >= 30
     }
 
     func refresh() {
         guard !isLoading else { return }
         isLoading = true
-        Task {
-            do {
-                let (response, creds) = try await UsageService.fetch()
-                usage = response
-                plan = creds.subscriptionType
-                lastUpdated = Date()
-                error = nil
-            } catch {
-                self.error = error.localizedDescription
-            }
-            isLoading = false
-            scheduleTimer()
-            onChange?()
+        Task { await performRefresh() }
+    }
+
+    func performRefresh() async {
+        isLoading = true
+        do {
+            let (response, creds) = try await fetcher()
+            usage = response
+            plan = creds.subscriptionType
+            lastUpdated = Date()
+            error = nil
+        } catch {
+            self.error = error.localizedDescription
         }
+        isLoading = false
+        scheduleTimer()
+        onChange?()
     }
 
     // MARK: Abrir al iniciar sesión

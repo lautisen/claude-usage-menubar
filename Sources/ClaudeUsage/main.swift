@@ -32,19 +32,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let percent = store.sessionPercent
         button.image = UsageBarsIcon.make(session: percent, weekly: store.usage?.sevenDay?.utilization)
         let text = percent.map { "\(Int($0.rounded()))%" } ?? "–"
-        var title = " " + text
-        if let reset = store.usage?.fiveHour?.resetDate, reset > Date() {
-            title += " · " + formatCountdown(to: reset).replacingOccurrences(of: " ", with: "")
-                .replacingOccurrences(of: "min", with: "m")
-        }
-        button.attributedTitle = NSAttributedString(string: title, attributes: [
-            .font: NSFont.monospacedDigitSystemFont(ofSize: 12, weight: .medium),
-        ])
-        // Solo se colorea cuando el uso empieza a ser alto; si no, se ve como un icono de sistema.
-        switch percent ?? 0 {
-        case 90...: button.contentTintColor = .systemRed
-        case 75...: button.contentTintColor = .systemOrange
-        default: button.contentTintColor = nil
+        button.attributedTitle = NSAttributedString(
+            string: menuBarTitle(sessionPercent: percent, reset: store.usage?.fiveHour?.resetDate),
+            attributes: [.font: NSFont.monospacedDigitSystemFont(ofSize: 12, weight: .medium)])
+        switch MenuBarAlert(percent: percent) {
+        case .critical: button.contentTintColor = .systemRed
+        case .warning: button.contentTintColor = .systemOrange
+        case .none: button.contentTintColor = nil
         }
         var tip = "Claude · sesión 5h: \(text)"
         if let reset = store.usage?.fiveHour?.resetDate { tip += " · reinicio \(formatResetTime(reset))" }

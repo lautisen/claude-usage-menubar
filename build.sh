@@ -10,7 +10,7 @@ rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 
 swiftc -O -swift-version 5 -target arm64-apple-macos14.0 \
-  -o "$APP/Contents/MacOS/ClaudeUsage" Sources/*.swift
+  -o "$APP/Contents/MacOS/ClaudeUsage" Sources/ClaudeUsage/*.swift
 
 cat > "$APP/Contents/Info.plist" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>
