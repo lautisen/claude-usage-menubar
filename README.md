@@ -38,8 +38,8 @@ Your token never leaves your machine except in the request to `api.anthropic.com
 ## Requirements
 
 - macOS 14 (Sonoma) or later, Apple Silicon
-- Xcode Command Line Tools (`xcode-select --install`)
 - Claude Code installed and logged in with a Claude subscription (`claude` → `/login`)
+- To build from source: Xcode or the Command Line Tools (`xcode-select --install`)
 
 ## Download
 
@@ -75,7 +75,7 @@ swift test
 
 What is covered:
 
-- **Networking** — `fetch()` end to end against a stubbed `URLProtocol`: auth headers, HTTP status → error mapping (401/403/429/5xx), and that no request is made without credentials.
+- **Networking** — `fetch()` end to end against a stubbed `URLProtocol`: auth headers, HTTP status → error mapping (401/403/429/5xx), and that no request is made without credentials or with an expired token.
 - **Parsing** — Keychain credential JSON (valid and malformed), a realistic API response with `null` windows and unknown fields, and ISO 8601 dates with microsecond fractions.
 - **State** — `UsageStore` refresh with an injected fetcher: publishing data, keeping the last good data on error, recovering, and the staleness rule.
 - **Formatting** — countdowns, reset times (fixed time zone), menu bar title and color thresholds, using parameterized tests.
