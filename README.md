@@ -35,7 +35,17 @@ Your token never leaves your machine except in the request to `api.anthropic.com
 - Xcode Command Line Tools (`xcode-select --install`)
 - Claude Code installed and logged in with a Claude subscription (`claude` → `/login`)
 
-## Build & install
+## Download
+
+Grab `ClaudeUsage.zip` from the [latest release](https://github.com/lautisen/claude-usage-menubar/releases/latest), unzip it and move `ClaudeUsage.app` to `~/Applications` or `/Applications`.
+
+The app is ad‑hoc signed (not notarized), so macOS will block it on first launch. Either right‑click it → **Open** → **Open**, or run:
+
+```sh
+xattr -dr com.apple.quarantine ~/Applications/ClaudeUsage.app
+```
+
+## Build from source
 
 ```sh
 git clone https://github.com/lautisen/claude-usage-menubar.git
