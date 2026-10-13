@@ -9,13 +9,13 @@ struct FormattingTests {
     // MARK: Countdown
 
     @Test("Countdown picks the largest useful units", arguments: [
-        (59.0, "0 min"),
-        (60.0, "1 min"),
-        (59 * 60.0, "59 min"),
-        (3600.0, "1 h 0 min"),
-        (2 * 3600 + 13 * 60.0, "2 h 13 min"),
-        (86_400.0, "1 d 0 h"),
-        (3 * 86_400 + 5 * 3600 + 59 * 60.0, "3 d 5 h"),
+        (59, "0 min"),
+        (60, "1 min"),
+        (3540, "59 min"),
+        (3600, "1 h 0 min"),
+        (7980, "2 h 13 min"),       // 2 h 13 min
+        (86_400, "1 d 0 h"),
+        (277_140, "3 d 5 h"),       // 3 d 5 h 59 min: los minutos se descartan
     ] as [(Double, String)])
     func countdown(seconds: Double, expected: String) {
         #expect(formatCountdown(to: now.addingTimeInterval(seconds), now: now) == expected)
