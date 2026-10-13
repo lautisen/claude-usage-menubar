@@ -1,5 +1,7 @@
 # Claude Usage — macOS menu bar app
 
+[![CI](https://github.com/lautisen/claude-usage-menubar/actions/workflows/ci.yml/badge.svg)](https://github.com/lautisen/claude-usage-menubar/actions/workflows/ci.yml)
+
 A lightweight native macOS menu bar app that shows your **Claude plan usage limits** in real time: the current 5‑hour session, the weekly limit, per‑model weekly limits and extra usage — with countdowns to each reset.
 
 > 🇪🇸 App nativa para la barra de menús de macOS que muestra en tiempo real el uso de los límites de tu plan de Claude (sesión de 5 h, semanal, por modelo y uso extra). La interfaz está en español.
@@ -18,7 +20,7 @@ A lightweight native macOS menu bar app that shows your **Claude plan usage limi
   - Extra usage credits vs. monthly limit, when enabled
 - **Auto‑refresh** every 2 minutes, plus refresh on open if data is older than 30 s; visible countdown to the next refresh.
 - **Launch at login** toggle (via `SMAppService`).
-- No Dock icon (`LSUIElement`), no dependencies, ~600 lines of Swift.
+- No Dock icon (`LSUIElement`), no third‑party dependencies.
 
 ### Light & dark mode
 
@@ -60,14 +62,36 @@ cd claude-usage-menubar
 
 The build uses `swiftc` directly (no Xcode project) and ad‑hoc signs the bundle.
 
+## Tests
+
+The project is a Swift package with a test suite written in [Swift Testing](https://developer.apple.com/documentation/testing):
+
+```sh
+swift test
+```
+
+> With only the Command Line Tools installed (no Xcode), you may need to point the compiler to the testing macros:
+> `swift test -Xswiftc -plugin-path -Xswiftc /Library/Developer/CommandLineTools/usr/lib/swift/host/plugins/testing`
+
+What is covered:
+
+- **Networking** — `fetch()` end to end against a stubbed `URLProtocol`: auth headers, HTTP status → error mapping (401/403/429/5xx), and that no request is made without credentials.
+- **Parsing** — Keychain credential JSON (valid and malformed), a realistic API response with `null` windows and unknown fields, and ISO 8601 dates with microsecond fractions.
+- **State** — `UsageStore` refresh with an injected fetcher: publishing data, keeping the last good data on error, recovering, and the staleness rule.
+- **Formatting** — countdowns, reset times (fixed time zone), menu bar title and color thresholds, using parameterized tests.
+
+CI runs the tests and builds the app bundle on every push and pull request.
+
 ## Project structure
 
 | File | Responsibility |
 | --- | --- |
-| `Sources/main.swift` | App delegate, status item, custom dropdown panel (`NSPanel`) and the menu bar icon drawing |
-| `Sources/UsageStore.swift` | Observable state, refresh scheduling, launch‑at‑login |
-| `Sources/UsageService.swift` | Keychain credential lookup, API request and `Decodable` models |
-| `Sources/PopoverView.swift` | SwiftUI views for the dropdown |
+| `Sources/ClaudeUsage/main.swift` | App delegate, status item, custom dropdown panel (`NSPanel`) and the menu bar icon drawing |
+| `Sources/ClaudeUsage/UsageStore.swift` | Observable state, refresh scheduling, launch‑at‑login; the fetcher is injected for testing |
+| `Sources/ClaudeUsage/UsageService.swift` | Keychain credential lookup, API request, status handling and `Decodable` models |
+| `Sources/ClaudeUsage/Formatting.swift` | Pure formatting and threshold logic shared by the menu bar and the dropdown |
+| `Sources/ClaudeUsage/PopoverView.swift` | SwiftUI views for the dropdown |
+| `Tests/ClaudeUsageTests/` | Swift Testing suites |
 | `build.sh` | Compiles and packages the `.app` bundle |
 
 ### Implementation notes
