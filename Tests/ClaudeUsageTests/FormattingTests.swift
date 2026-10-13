@@ -15,7 +15,7 @@ struct FormattingTests {
         (3600, "1 h 0 min"),
         (7980, "2 h 13 min"),       // 2 h 13 min
         (86_400, "1 d 0 h"),
-        (277_140, "3 d 5 h"),       // 3 d 5 h 59 min: los minutos se descartan
+        (280_740, "3 d 5 h"),       // 3 d 5 h 59 min: los minutos se descartan
     ] as [(Double, String)])
     func countdown(seconds: Double, expected: String) {
         #expect(formatCountdown(to: now.addingTimeInterval(seconds), now: now) == expected)
