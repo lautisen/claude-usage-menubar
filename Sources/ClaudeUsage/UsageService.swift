@@ -117,8 +117,11 @@ enum UsageService {
     }
 
     static func fetch(credentials: () throws -> Credentials = readCredentials,
-                      session: URLSession = .shared) async throws -> (UsageResponse, Credentials) {
+                      session: URLSession = .shared,
+                      now: Date = Date()) async throws -> (UsageResponse, Credentials) {
         let creds = try credentials()
+        // Un token caducado daría 401 de todas formas: se evita la petición y se avisa directamente.
+        if let expiresAt = creds.expiresAt, expiresAt <= now { throw UsageError.tokenExpired }
         let (data, response) = try await session.data(for: makeRequest(token: creds.accessToken))
         try validate(status: (response as? HTTPURLResponse)?.statusCode ?? 0)
         return (try decodeUsage(data), creds)

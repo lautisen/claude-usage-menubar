@@ -119,6 +119,25 @@ struct UsageServiceFetchTests {
         }
     }
 
+    @Test func expiredTokenSkipsTheNetwork() async {
+        var requested = false
+        let session = StubURLProtocol.session { _ in requested = true; return (200, usageFixture) }
+        let now = Date()
+        let expired = Credentials(accessToken: "tok", expiresAt: now.addingTimeInterval(-1), subscriptionType: nil)
+        await #expect(throws: UsageError.tokenExpired) {
+            try await UsageService.fetch(credentials: { expired }, session: session, now: now)
+        }
+        #expect(!requested)
+    }
+
+    @Test func tokenThatIsStillValidIsUsed() async throws {
+        let session = StubURLProtocol.session { _ in (200, usageFixture) }
+        let now = Date()
+        let valid = Credentials(accessToken: "tok", expiresAt: now.addingTimeInterval(60), subscriptionType: nil)
+        let (usage, _) = try await UsageService.fetch(credentials: { valid }, session: session, now: now)
+        #expect(usage.fiveHour?.utilization == 25)
+    }
+
     @Test func missingCredentialsSkipTheNetwork() async {
         var requested = false
         let session = StubURLProtocol.session { _ in requested = true; return (200, usageFixture) }
