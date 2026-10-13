@@ -147,12 +147,14 @@ struct LimitCard: View {
 struct UsageBar: View {
     let percent: Double
     var height: CGFloat = 6
+    /// Por defecto se colorea según el nivel de uso; un color fijo sirve para barras que no son límites.
+    var color: Color?
 
     var body: some View {
         GeometryReader { geo in
             ZStack(alignment: .leading) {
                 Capsule().fill(Color.primary.opacity(0.1))
-                Capsule().fill(usageColor(percent))
+                Capsule().fill(color ?? usageColor(percent))
                     .frame(width: max(height, geo.size.width * min(percent, 100) / 100))
                     .opacity(percent > 0 ? 1 : 0)
             }
@@ -170,7 +172,7 @@ struct BreakdownView: View {
             ForEach(rows.sorted { $0.percent > $1.percent }) { row in
                 HStack(spacing: 8) {
                     Text(row.displayName).font(.caption).frame(width: 84, alignment: .leading)
-                    UsageBar(percent: row.percent, height: 4).tint(.accentColor)
+                    UsageBar(percent: row.percent, height: 4, color: .accentColor)
                     Text("\(Int(row.percent))%").font(.caption).monospacedDigit()
                         .frame(width: 34, alignment: .trailing)
                 }
