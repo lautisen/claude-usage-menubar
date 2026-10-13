@@ -5,10 +5,7 @@ A lightweight native macOS menu bar app that shows your **Claude plan usage limi
 > 🇪🇸 App nativa para la barra de menús de macOS que muestra en tiempo real el uso de los límites de tu plan de Claude (sesión de 5 h, semanal, por modelo y uso extra). La interfaz está en español.
 
 <p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="docs/screenshot-dark.png">
-    <img src="docs/screenshot-light.png" alt="Claude Usage dropdown panel" width="368">
-  </picture>
+  <img src="docs/screenshot.png" alt="Claude Usage in the macOS menu bar with its dropdown open" width="400">
 </p>
 
 ## Features
@@ -22,6 +19,13 @@ A lightweight native macOS menu bar app that shows your **Claude plan usage limi
 - **Auto‑refresh** every 2 minutes, plus refresh on open if data is older than 30 s; visible countdown to the next refresh.
 - **Launch at login** toggle (via `SMAppService`).
 - No Dock icon (`LSUIElement`), no dependencies, ~600 lines of Swift.
+
+### Light & dark mode
+
+<p align="center">
+  <img src="docs/screenshot-light.png" alt="Dropdown in light mode" width="300">
+  <img src="docs/screenshot-dark.png" alt="Dropdown in dark mode" width="300">
+</p>
 
 ## How it works
 
