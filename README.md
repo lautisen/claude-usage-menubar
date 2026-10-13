@@ -4,7 +4,12 @@ A lightweight native macOS menu bar app that shows your **Claude plan usage limi
 
 > 🇪🇸 App nativa para la barra de menús de macOS que muestra en tiempo real el uso de los límites de tu plan de Claude (sesión de 5 h, semanal, por modelo y uso extra). La interfaz está en español.
 
-<!-- Add a screenshot: ![Screenshot](docs/screenshot.png) -->
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/screenshot-dark.png">
+    <img src="docs/screenshot-light.png" alt="Claude Usage dropdown panel" width="368">
+  </picture>
+</p>
 
 ## Features
 

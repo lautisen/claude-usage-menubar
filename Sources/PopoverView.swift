@@ -99,8 +99,7 @@ struct PopoverView: View {
             TimelineView(.periodic(from: .now, by: 1)) { context in
                 VStack(alignment: .leading, spacing: 1) {
                     if let last = store.lastUpdated {
-                        Text("Actualizado \(last.formatted(.relative(presentation: .named, unitsStyle: .abbreviated)))")
-                            .environment(\.locale, Locale(identifier: "es_ES"))
+                        Text("Actualizado \(last.formatted(.relative(presentation: .named, unitsStyle: .abbreviated).locale(Locale(identifier: "es_ES"))))")
                     }
                     if store.isLoading {
                         Text("Actualizando…")
