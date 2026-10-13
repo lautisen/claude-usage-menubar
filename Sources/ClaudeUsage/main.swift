@@ -30,16 +30,22 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private func updateStatusItem() {
         guard let button = statusItem.button else { return }
         let percent = store.sessionPercent
-        button.image = UsageBarsIcon.make(session: percent, weekly: store.usage?.sevenDay?.utilization)
+        // El color de alerta se pinta directamente: con contentTintColor la barra de menús
+        // aplica su vibrancia y el rojo/naranja acaba viéndose negro.
+        let alertColor: NSColor? = switch MenuBarAlert(percent: percent) {
+        case .critical: .systemRed
+        case .warning: .systemOrange
+        case .none: nil
+        }
+        button.image = UsageBarsIcon.make(session: percent, weekly: store.usage?.sevenDay?.utilization,
+                                          color: alertColor)
         let text = percent.map { "\(Int($0.rounded()))%" } ?? "–"
+        var attributes: [NSAttributedString.Key: Any] = [
+            .font: NSFont.monospacedDigitSystemFont(ofSize: 12, weight: .medium)]
+        if let alertColor { attributes[.foregroundColor] = alertColor }
         button.attributedTitle = NSAttributedString(
             string: menuBarTitle(sessionPercent: percent, reset: store.usage?.fiveHour?.resetDate),
-            attributes: [.font: NSFont.monospacedDigitSystemFont(ofSize: 12, weight: .medium)])
-        switch MenuBarAlert(percent: percent) {
-        case .critical: button.contentTintColor = .systemRed
-        case .warning: button.contentTintColor = .systemOrange
-        case .none: button.contentTintColor = nil
-        }
+            attributes: attributes)
         var tip = "Claude · sesión 5h: \(text)"
         if let reset = store.usage?.fiveHour?.resetDate { tip += " · reinicio \(formatResetTime(reset))" }
         if let weekly = store.usage?.sevenDay?.utilization { tip += "\nSemana: \(Int(weekly.rounded()))%" }
@@ -149,9 +155,10 @@ final class SizeTrackingHostingView<Content: View>: NSHostingView<Content> {
 }
 
 /// Dos barras verticales finas que se llenan de abajo arriba: sesión de 5 h (izquierda)
-/// y semana (derecha).
+/// y semana (derecha). Sin `color` es una imagen plantilla que sigue el tema de la barra.
 enum UsageBarsIcon {
-    static func make(session: Double?, weekly: Double?) -> NSImage {
+    static func make(session: Double?, weekly: Double?, color: NSColor? = nil) -> NSImage {
+        let ink = color ?? .black
         let barWidth: CGFloat = 4, gap: CGFloat = 2.5, height: CGFloat = 14
         let size = NSSize(width: barWidth * 2 + gap + 1, height: height)
         let image = NSImage(size: size, flipped: false) { _ in
@@ -160,19 +167,19 @@ enum UsageBarsIcon {
                                    width: barWidth, height: height - 1)
                 let outline = NSBezierPath(roundedRect: track, xRadius: 1.5, yRadius: 1.5)
                 outline.lineWidth = 1
-                NSColor.black.withAlphaComponent(0.4).setStroke()
+                ink.withAlphaComponent(0.4).setStroke()
                 outline.stroke()
 
                 if let percent, percent > 0 {
                     let fillHeight = max(1.5, track.height * CGFloat(min(percent, 100) / 100))
-                    NSColor.black.setFill()
+                    ink.setFill()
                     NSBezierPath(roundedRect: NSRect(x: track.minX, y: track.minY, width: track.width, height: fillHeight),
                                  xRadius: 1.5, yRadius: 1.5).fill()
                 }
             }
             return true
         }
-        image.isTemplate = true
+        image.isTemplate = color == nil
         return image
     }
 }
