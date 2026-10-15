@@ -6,8 +6,8 @@ enum UsageLevel: Equatable {
 
     init(percent: Double) {
         switch percent {
-        case ..<50: self = .low
-        case ..<80: self = .medium
+        case ..<75: self = .low
+        case ..<90: self = .medium
         default: self = .high
         }
     }

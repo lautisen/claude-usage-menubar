@@ -69,7 +69,7 @@ struct FormattingTests {
     }
 
     @Test("Usage level thresholds", arguments: [
-        (0, UsageLevel.low), (49.9, .low), (50, .medium), (79.9, .medium), (80, .high), (100, .high),
+        (0, UsageLevel.low), (74.9, .low), (75, .medium), (89.9, .medium), (90, .high), (100, .high),
     ] as [(Double, UsageLevel)])
     func usageLevel(percent: Double, expected: UsageLevel) {
         #expect(UsageLevel(percent: percent) == expected)
